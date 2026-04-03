@@ -600,7 +600,7 @@ server = HTTPServer(("0.0.0.0", 8000), CloudService)
 print("Server running on port 8000...")
 server.serve_forever()
 
-Even or odd
+Even or odd python cloud 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 
@@ -743,3 +743,221 @@ server = HTTPServer(("0.0.0.0", 8000), CloudService)
 print("Server running on port 8000...")
 server.serve_forever()
 
+GCD python cloud
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from urllib.parse import urlparse, parse_qs
+
+class CloudService(BaseHTTPRequestHandler):
+
+    def do_GET(self):
+        parsed_url = urlparse(self.path)
+        params = parse_qs(parsed_url.query)
+
+        if parsed_url.path == "/":
+            self.show_form()
+
+        elif parsed_url.path == "/process":
+            self.process_request(params)
+
+    def show_form(self):
+        html = """
+        <html>
+        <body>
+            <h2>GCD Calculator (Cloud Simulation)</h2>
+            <form action="/process" method="get">
+                Enter your name:
+                <input type="text" name="name"><br><br>
+
+                Enter first number:
+                <input type="number" name="a"><br><br>
+
+                Enter second number:
+                <input type="number" name="b"><br><br>
+
+                <input type="submit" value="Calculate">
+            </form>
+        </body>
+        </html>
+        """
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+        self.wfile.write(html.encode())
+
+    def process_request(self, params):
+        name = params.get("name", ["Guest"])[0]
+        a = int(params.get("a", [0])[0])
+        b = int(params.get("b", [0])[0])
+
+        # GCD logic (Euclidean Algorithm)
+        x, y = a, b
+        while y != 0:
+            x, y = y, x % y
+
+        gcd = x
+
+        result = f"""
+        <html>
+        <body>
+            <h3>Hello {name}</h3>
+            <p>First Number: {a}</p>
+            <p>Second Number: {b}</p>
+            <p>GCD: <b>{gcd}</b></p>
+        </body>
+        </html>
+        """
+
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+        self.wfile.write(result.encode())
+
+server = HTTPServer(("0.0.0.0", 8000), CloudService)
+print("Server running on port 8000...")
+server.serve_forever()
+
+Krishnamurthy number python cloud
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from urllib.parse import urlparse, parse_qs
+
+class CloudService(BaseHTTPRequestHandler):
+
+    def do_GET(self):
+        parsed_url = urlparse(self.path)
+        params = parse_qs(parsed_url.query)
+
+        if parsed_url.path == "/":
+            self.show_form()
+
+        elif parsed_url.path == "/process":
+            self.process_request(params)
+
+    def show_form(self):
+        html = """
+        <html>
+        <body>
+            <h2>Krishnamurthy Number Checker (Cloud Simulation)</h2>
+            <form action="/process" method="get">
+                Enter your name:
+                <input type="text" name="name"><br><br>
+
+                Enter a number:
+                <input type="number" name="num"><br><br>
+
+                <input type="submit" value="Check">
+            </form>
+        </body>
+        </html>
+        """
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+        self.wfile.write(html.encode())
+
+    def process_request(self, params):
+        name = params.get("name", ["Guest"])[0]
+        num = int(params.get("num", [0])[0])
+
+        # Function to calculate factorial
+        def factorial(n):
+            fact = 1
+            for i in range(1, n + 1):
+                fact *= i
+            return fact
+
+        # Krishnamurthy logic
+        temp = num
+        total = 0
+
+        while temp > 0:
+            digit = temp % 10
+            total += factorial(digit)
+            temp //= 10
+
+        if total == num:
+            result_value = "Krishnamurthy Number"
+        else:
+            result_value = "Not a Krishnamurthy Number"
+
+        result = f"""
+        <html>
+        <body>
+            <h3>Hello {name}</h3>
+            <p>Entered Number: {num}</p>
+            <p>Result: <b>{result_value}</b></p>
+        </body>
+        </html>
+        """
+
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+        self.wfile.write(result.encode())
+
+server = HTTPServer(("0.0.0.0", 8000), CloudService)
+print("Server running on port 8000...")
+server.serve_forever()
+
+Reverse number python cloud
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from urllib.parse import urlparse, parse_qs
+
+class CloudService(BaseHTTPRequestHandler):
+
+    def do_GET(self):
+        parsed_url = urlparse(self.path)
+        params = parse_qs(parsed_url.query)
+
+        if parsed_url.path == "/":
+            self.show_form()
+
+        elif parsed_url.path == "/process":
+            self.process_request(params)
+
+    def show_form(self):
+        html = """
+        <html>
+        <body>
+            <h2>Reverse Number (Cloud Simulation)</h2>
+            <form action="/process" method="get">
+                Enter your name:
+                <input type="text" name="name"><br><br>
+
+                Enter a number:
+                <input type="number" name="num"><br><br>
+
+                <input type="submit" value="Reverse">
+            </form>
+        </body>
+        </html>
+        """
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+        self.wfile.write(html.encode())
+
+    def process_request(self, params):
+        name = params.get("name", ["Guest"])[0]
+        num = int(params.get("num", [0])[0])
+
+        # Reverse number logic
+        reverse = int(str(num)[::-1])
+
+        result = f"""
+        <html>
+        <body>
+            <h3>Hello {name}</h3>
+            <p>Entered Number: {num}</p>
+            <p>Reversed Number: <b>{reverse}</b></p>
+        </body>
+        </html>
+        """
+
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+        self.wfile.write(result.encode())
+
+server = HTTPServer(("0.0.0.0", 8000), CloudService)
+print("Server running on port 8000...")
+server.serve_forever()
