@@ -1,0 +1,59 @@
+Databricks
+Class program 1st
+SELECT *
+FROM csv.`/databricks-datasets/samples/population-vs-price/data_geo.csv`
+LIMIT 10;
+--Check the Average Price
+SELECT
+  State,
+  AVG(CAST(`2015 median sales price` AS DOUBLE)) AS Avg_Price
+FROM read_files(
+  '/databricks-datasets/samples/population-vs-price/data_geo.csv',
+  format => 'csv',
+  header => true,
+  inferSchema => true
+)
+GROUP BY State
+ORDER BY Avg_Price DESC;
+--Check the Population Estimate and Plot a Bar Chart
+SELECT
+  State,
+  SUM(CAST(`2014 population estimate` AS DOUBLE)) AS Total_Population_2014
+FROM read_files(
+  '/databricks-datasets/samples/population-vs-price/data_geo.csv',
+  format => 'csv',
+  header => true,
+  inferSchema => true
+)
+GROUP BY State
+ORDER BY Total_Population_2014 DESC;
+
+2nd one class program
+SELECT
+  City,
+  State,
+  `2014 population estimate` AS Population_2014,
+  `2015 median sales price` AS Price_2015
+FROM read_files(
+  '/databricks-datasets/samples/population-vs-price/data_geo.csv',
+  format => 'csv',
+  header => true,
+  inferSchema => true
+)
+-- The colon (:) tells the Warehouse to create an input box automatically
+WHERE State = :state_param
+ORDER BY Population_2014 DESC;
+
+
+other datasets
+Flights dataset -> 1] SELECT *
+FROM groupbwt_airport_flight_delay_schedule_change_dataset.flights.flights
+LIMIT 10;
+2] SELECT *
+FROM databricks_airline_performance_data.v01.flights
+LIMIT 10;
+Diamonds dataset -> CSV DELIMITED-> /databricks-datasets/Rdatasets/data-001/csv/ggplot2/diamonds.csv
+NYC TAXI TRIPS -> SELECT * 
+FROM samples.nyctaxi.trips
+LIMIT 10;
+IOT DEVICES -> /databricks-datasets/iot/iot_devices.json
