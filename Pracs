@@ -961,3 +961,125 @@ class CloudService(BaseHTTPRequestHandler):
 server = HTTPServer(("0.0.0.0", 8000), CloudService)
 print("Server running on port 8000...")
 server.serve_forever()
+
+Cloud Computing services [theory]
+1) IaaS
+
+Definition:
+IaaS provides a variety of computing infrastructure such as storage, servers, and hardware. It also maintains and supports these infrastructure.
+
+Key Features:
+(i) flexible
+(ii) resources are highly scalable
+(iii) cost depends on use
+(iv) single piece of hardware serves many users
+(v) Guest has complete control over the architecture
+
+Pros:
+(i) Most flexible & dynamic model
+(ii) cost effective pay for what you use
+(iii) easy to use since it drops hardware automatically
+(iv) Management tasks are handled, so employees have time for other tasks
+
+Cons:
+(i) Data security can be a concern due to multitenant architecture
+(ii) Team handling is required to know about the own infrastructure
+(iii) While servers controlled at user side, customers cannot access their hardware
+
+2) PaaS
+
+Definition:
+PaaS is a cloud service where the development, testing & organizing the software app takes place. Implementing PaaS simplifies the process of software development.
+
+Key Features:
+(i) Multiple users can access the same app
+(ii) Users are managing their own data
+(iii) Run services & databases are managed in same environment
+(iv) Web services & databases are hosted
+(v) Teams can collaborate easily
+
+Pros:
+(i) The development process is faster & easy
+(ii) creating, testing and deploying app is cost efficient
+(iii) less coding is required
+(iv) easy migration to hybrid cloud
+
+Cons:
+(i) Data security is an issue due to multitenant architecture
+(ii) Not every element is compatible with existing infrastructure
+
+3) SaaS
+
+Definition:
+SaaS provides software operating from hardware infrastructure using the app functionality and users are all available for working in their pocket. They only use programs to complete their tasks.
+
+Key Features:
+(i) Transmission & upgradation will be done by providers
+(ii) services are scaled based on requirements
+(iii) Apps are accessed through centralized system
+(iv) The provider is responsible for security
+
+Pros:
+(i) No hardware & setup cost, it is a pay-as-you-go model
+(ii) It is easy to use and user friendly
+(iii) Access from any location
+
+Cons:
+(i) The application has to be within control
+(ii) limited range of data controls
+(iii) The devices should be connected for efficient working
+
+Cisco cloud [theory]
+Cisco cloud (meta cloud)
+
+→ In 2016, Cisco acquired its rights to acquire privately held Metacloud. Based in Pasadena, Calif., metacloud offers a private cloud or global OpenStack platform. Using OpenStack, a open source model that delivers a variety of computing, production ready private cloud infrastructure to its users.
+
+→ Metacloud’s OpenStack based cloud platform was accessed on Cisco strongly to build a robust target global infrastructure, a network of cloud, together with ease, to deliver solutions anywhere.
+
+→ VMware based services can be easily deployed in Cisco cloud, helping technology providers, services providers, as well as large enterprises to run Cisco cloud services. Cisco cloud platform can be used by service providers to offer cloud services to their customers.
+
+→ The open cloud strategy of Cisco accelerates helping in the ability to handle on demand, private, hybrid or public cloud. Also the ability to manage open networking, reduce TCO and increase performance.
+
+→ Cisco’s cloud platform provides a wide range of services including virtualization, storage, networking and analytics, making it a complete cloud solution.
+
+Foss Cloud [theory]
+Free and open source software (FOSS) cloud computing represents the convergence of open source software with distributed networked computing. In simple terms, it is the application to cloud computing that makes use of free and open source software.
+
+History & Evolution:
+1983 – Free & open cloud computing
+1990s – Free software movement
+1998 – Linux & open source
+2000s – present: Free & open cloud
+Background & Purpose
+Philosophy: For ensuring transparency, avoiding vendor lock-in, community driven development.
+Economic Benefit: Free software licensing cost associated with proprietary enterprise software.
+Corporate Adoption: Large companies (Red Hat, IBM, Google) invest in & contribute to FOSS, making it dominant force in cloud infrastructure.
+Security: The availability of source code allows for faster, proactive vulnerability discovery & fixing.
+
+RSS Feed Prac8 [XML]
+<rss version="2.0">
+    <channel>
+        <title>RSS Practical</title>
+        <link>http://siesascs.edu.in</link>
+        <description>Cloud Computing Practical</description>
+
+        <item>
+            <title>RSS Tutorial</title>
+            <link>https://en.wikipedia.org/wiki/Cricket_World_Cup</link>
+            <description>List of Cricket World Cup Winners</description>
+        </item>
+
+        <item>
+            <title>World Cup Winners</title>
+            <link></link>
+            <description>New RSS tutorial on W3Schools</description>
+        </item>
+
+        <item>
+            <title>Facebook</title>
+            <link>https://www.facebook.com</link>
+            <description>Open Facebook Page</description>
+        </item>
+
+    </channel>
+</rss>
