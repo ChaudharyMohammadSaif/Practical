@@ -1,28 +1,32 @@
 Ceaser Cipher Program
 Encrypt text:-
-import string msg = input("Enter message to Encrypt:") 
+import string 
+msg = input("Enter message to Encrypt:") 
 def encrypt(msg, key=3): 
-pt = list(string.ascii_lowercase) + list(string.ascii_uppercase) 
-cipher= "" 
-for char in range(len(msg)): 
-if msg[char] in pt: 
-E = (pt.index(msg[char]) + key) % len(pt) cipher += pt[E] 
-else: 
-cipher += msg[char] 
-return cipher print("Cipher text: ", encrypt(msg))
+    pt = list(string.ascii_lowercase) + list(string.ascii_uppercase) 
+    cipher= "" 
+    for char in range(len(msg)): 
+        if msg[char] in pt: 
+            E = (pt.index(msg[char]) + key) % len(pt) 
+            cipher += pt[E] 
+        else: 
+            cipher += msg[char] 
+    return cipher print("Cipher text: ", encrypt(msg))
 
 Decrypt text:-
-import string msg = input("Enter message to Decrypt:") 
+import string 
+msg = input("Enter message to Decrypt:") 
 def decrypt(msg, key=3): 
-pt = list(string.ascii_lowercase) + list(string.ascii_uppercase) 
-plain = "" 
-for char in range(len(msg)): 
-if msg[char] in pt: 
-D = (pt.index(msg[char]) - key) % len(pt) 
-plain += pt[D] 
-else: 
-plain += msg[char] 
-return plain print("Plain text: ", decrypt(msg))
+    pt = list(string.ascii_lowercase) + list(string.ascii_uppercase) 
+    plain = "" 
+    for char in range(len(msg)): 
+        if msg[char] in pt: 
+            D = (pt.index(msg[char]) - key) % len(pt) 
+            plain += pt[D] 
+        else: 
+            plain += msg[char] 
+    return plain print("Plain text: ", decrypt(msg))
+
 
 Monoalphabetic Cipher Program
 import random
@@ -199,7 +203,6 @@ print("Encrypted message: ", cipher_text)
 
 Columnar Cipher Program
 import math
-
 msg = input("Enter the message to encrypt here: ").replace(" ", "")
 keyword = input("Enter the word to be used as key: ")
 
@@ -221,9 +224,7 @@ def columnar(pt, key):
     for index, ch in key_index:
         for row in matrix:
             ct += row[index]
-
     return ct
-
 print(columnar(msg, keyword))
 
 
