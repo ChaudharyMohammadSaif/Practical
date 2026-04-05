@@ -312,3 +312,27 @@ def keyrelease(key):
         return False
 with Listener(on_press=keypress,on_release=keyrelease) as lst:
     lst.join()
+
+nmap -p 1-65535 www.siesascs.edu.in
+NMAP Practical Commands
+1]nmap
+2]ipconfig
+3]nmap –sL siesascs.edu.in
+4]nmap –sP siesascs.edu.in
+5]nmap siesascs.edu.in
+6]nmap -sL 192.168.0.2
+7]nmap -sV 192.168.20.244
+8]nmap -p 88,442 www.siesascs.edu.in
+9]nmap -O 192.168.20.244
+10]nmap -A www.siesascs.edu.in
+11]nmap --top-ports 10 www.siesascs.edu.in
+12]nmap -p 1-65535 www.siesascs.edu.in
+13]nmap --script ftp-vuln-cve2010-4221 -sV www.siesascs.edu.in
+14]nmap --traceroute www.siesascs.edu.in
+15]nmap –sA www.siesascs.edu.in
+16]nmap –sA -v www.siesascs.edu.in
+17]nmap -sS www.siesascs.edu.in
+18]nmap -sS -p 22,113,139 www.siesascs.edu.in
+19]nmap -sF -p 22,113,139 www.siesascs.edu.in
+20]nmap -sX -p 22,113,139 www.siesascs.edu.in
+21]nmap -sN -p 22,113,139 www.siesascs.edu.in
