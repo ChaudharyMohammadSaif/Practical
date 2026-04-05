@@ -1,1085 +1,313 @@
-Databricks
-Class program 1st
-SELECT *
-FROM csv.`/databricks-datasets/samples/population-vs-price/data_geo.csv`
-LIMIT 10;
---Check the Average Price
-SELECT
-  State,
-  AVG(CAST(`2015 median sales price` AS DOUBLE)) AS Avg_Price
-FROM read_files(
-  '/databricks-datasets/samples/population-vs-price/data_geo.csv',
-  format => 'csv',
-  header => true,
-  inferSchema => true
-)
-GROUP BY State
-ORDER BY Avg_Price DESC;
---Check the Population Estimate and Plot a Bar Chart
-SELECT
-  State,
-  SUM(CAST(`2014 population estimate` AS DOUBLE)) AS Total_Population_2014
-FROM read_files(
-  '/databricks-datasets/samples/population-vs-price/data_geo.csv',
-  format => 'csv',
-  header => true,
-  inferSchema => true
-)
-GROUP BY State
-ORDER BY Total_Population_2014 DESC;
+Ceaser Cipher Program
+Encrypt text:-
+import string msg = input("Enter message to Encrypt:") 
+def encrypt(msg, key=3): 
+pt = list(string.ascii_lowercase) + list(string.ascii_uppercase) 
+cipher= "" 
+for char in range(len(msg)): 
+if msg[char] in pt: 
+E = (pt.index(msg[char]) + key) % len(pt) cipher += pt[E] 
+else: 
+cipher += msg[char] 
+return cipher print("Cipher text: ", encrypt(msg))
 
-2nd one class program
-SELECT
-  City,
-  State,
-  `2014 population estimate` AS Population_2014,
-  `2015 median sales price` AS Price_2015
-FROM read_files(
-  '/databricks-datasets/samples/population-vs-price/data_geo.csv',
-  format => 'csv',
-  header => true,
-  inferSchema => true
-)
--- The colon (:) tells the Warehouse to create an input box automatically
-WHERE State = :state_param
-ORDER BY Population_2014 DESC;
+Decrypt text:-
+import string msg = input("Enter message to Decrypt:") 
+def decrypt(msg, key=3): 
+pt = list(string.ascii_lowercase) + list(string.ascii_uppercase) 
+plain = "" 
+for char in range(len(msg)): 
+if msg[char] in pt: 
+D = (pt.index(msg[char]) - key) % len(pt) 
+plain += pt[D] 
+else: 
+plain += msg[char] 
+return plain print("Plain text: ", decrypt(msg))
 
+Monoalphabetic Cipher Program
+import random
+import string
 
-other datasets
-Flights dataset -> 1] SELECT *
-FROM groupbwt_airport_flight_delay_schedule_change_dataset.flights.flights
-LIMIT 10;
-2] SELECT *
-FROM databricks_airline_performance_data.v01.flights
-LIMIT 10;
-Diamonds dataset -> CSV DELIMITED-> /databricks-datasets/Rdatasets/data-001/csv/ggplot2/diamonds.csv
-NYC TAXI TRIPS -> SELECT * 
-FROM samples.nyctaxi.trips
-LIMIT 10;
-IOT DEVICES -> /databricks-datasets/iot/iot_devices.json
+msg = input("Enter message to encrypt: ")
 
-JVM Practical
-1] public class VirtualizationClass {
-    public static void main(String[] args) {
-        System.out.println("JVM Name: " + System.getProperty("java.vm.name"));
-        System.out.println("OS Name: " + System.getProperty("os.name"));
-        System.out.println("Max JVM Memory: "
-                + Runtime.getRuntime().maxMemory() / (1024 * 1024) + " MB");
-        try {
-            int[] arr = new int[500_000_000];
-            System.out.println("Memory allocated successfully!");
-        } catch (OutOfMemoryError e) {
-            System.out.println("OutOfMemoryError occurred!");
-        }
-    }
-}
+def gen_key():
+    symbols = list(string.ascii_lowercase)
+    sym_shuff = list(string.ascii_lowercase)
+    random.shuffle(sym_shuff)
+    return dict(zip(symbols, sym_shuff))
 
-2] import java.util.Scanner;
+key = gen_key()
+print("Generated key:", key)
 
-public class pract2 {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        Runtime runtime = Runtime.getRuntime();
-
-        System.out.print("Enter a string: ");
-        String input = sc.nextLine();
-
-        // JVM memory details before allocation
-        long totalMemory = runtime.totalMemory();
-        long freeMemory = runtime.freeMemory();
-        long usedMemory = totalMemory - freeMemory;
-
-        System.out.println("\n===== JVM MEMORY BEFORE PROCESSING =====");
-        System.out.println("Max JVM memory : " + Runtime.getRuntime().maxMemory() / (1024 * 1024) + " MB");
-        System.out.println("Total JVM Memory : " + totalMemory / (1024 * 1024) + " MB");
-        System.out.println("Used JVM Memory : " + usedMemory / (1024 * 1024) + " MB");
-        System.out.println("========================================");
-
-        char[] chars = input.toCharArray();
-
-        try {
-            // Traverse string in reverse
-            for (int i = chars.length - 1; i >= 0; i--) {
-
-                // Memory allocation per character
-                byte[] memoryBlock = new byte[1024 * 1024]; // 1 MB allocation
-                memoryBlock[0] = (byte) chars[i];
-
-                // JVM memory after allocation
-                long usedNow = runtime.totalMemory() - runtime.freeMemory();
-
-                System.out.println("Character: " + chars[i] +
-                        " | Used JVM Memory: " + (usedNow / (1024 * 1024)) + " MB");
-            }
-
-        } catch (OutOfMemoryError e) {
-            System.out.println("OutOfMemoryError occurred!");
-        }
-
-        sc.close();
-    }
-}
-
-Python Cloud Practical
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
-class CloudService(BaseHTTPRequestHandler):
-
-    def do_GET(self):
-        parsed_url = urlparse(self.path)
-        params = parse_qs(parsed_url.query)
-
-        if parsed_url.path == "/":
-            self.show_form()
-
-        elif parsed_url.path == "/process":
-            self.process_request(params)
-
-    def show_form(self):
-        html = """
-        <html>
-        <body>
-            <h2>Cloud Computing Simulation</h2>
-            <form action="/process" method="get">
-                Enter your name:
-                <input type="text" name="name"><br><br>
-
-                Enter number of users:
-                <input type="number" name="users"><br><br>
-
-                <input type="submit" value="Send Request">
-            </form>
-        </body>
-        </html>
-        """
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(html.encode())
-
-    def process_request(self, params):
-        name = params.get("name", ["Guest"])[0]
-        users = int(params.get("users", [1])[0])
-
-        if users <= 10:
-            response = "Low Load"
-        elif users <= 50:
-            response = "Medium Load"
+def encryption(msg, keyword):
+    cipher = ""
+    for char in msg:
+        if char.lower() in keyword:   # check lowercase version
+            # preserve case
+            enc = keyword[char.lower()]
+            cipher += enc.upper() if char.isupper() else enc
         else:
-            response = "High Load – Scaling Needed!"
+            cipher += char
+    return cipher
 
-        result = f"""
-        <html>
-        <body>
-            <h3>Hello {name}</h3>
-            <p>Users accessing service: {users}</p>
-            <p>System Status: <b>{response}</b></p>
-        </body>
-        </html>
-        """
-
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(result.encode())
-
-server = HTTPServer(("0.0.0.0", 8000), CloudService)
-print("Cloud service running on port 8000...")
-server.serve_forever()
-
-factorial python cloud
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
-
-class CloudService(BaseHTTPRequestHandler):
-
-    def do_GET(self):
-        parsed_url = urlparse(self.path)
-        params = parse_qs(parsed_url.query)
-
-        if parsed_url.path == "/":
-            self.show_form()
-
-        elif parsed_url.path == "/process":
-            self.process_request(params)
-
-    def show_form(self):
-        html = """
-        <html>
-        <body>
-            <h2>Factorial Calculator (Cloud Simulation)</h2>
-            <form action="/process" method="get">
-                Enter your name:
-                <input type="text" name="name"><br><br>
-
-                Enter a number:
-                <input type="number" name="num"><br><br>
-
-                <input type="submit" value="Calculate">
-            </form>
-        </body>
-        </html>
-        """
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(html.encode())
-
-    def process_request(self, params):
-        name = params.get("name", ["Guest"])[0]
-        num = int(params.get("num", [0])[0])
-
-        # Factorial logic
-        factorial = 1
-        if num < 0:
-            result_value = "Factorial not defined for negative numbers"
-        else:
-            for i in range(1, num + 1):
-                factorial *= i
-            result_value = factorial
-
-        result = f"""
-        <html>
-        <body>
-            <h3>Hello {name}</h3>
-            <p>Entered Number: {num}</p>
-            <p>Factorial: <b>{result_value}</b></p>
-        </body>
-        </html>
-        """
-
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(result.encode())
-
-server = HTTPServer(("0.0.0.0", 8000), CloudService)
-print("Server running on port 8000...")
-server.serve_forever()
-
-fibonacci python cloud
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
-
-class CloudService(BaseHTTPRequestHandler):
-
-    def do_GET(self):
-        parsed_url = urlparse(self.path)
-        params = parse_qs(parsed_url.query)
-
-        if parsed_url.path == "/":
-            self.show_form()
-
-        elif parsed_url.path == "/process":
-            self.process_request(params)
-
-    def show_form(self):
-        html = """
-        <html>
-        <body>
-            <h2>Fibonacci Series Calculator (Cloud Simulation)</h2>
-            <form action="/process" method="get">
-                Enter your name:
-                <input type="text" name="name"><br><br>
-
-                Enter number of terms:
-                <input type="number" name="num"><br><br>
-
-                <input type="submit" value="Generate">
-            </form>
-        </body>
-        </html>
-        """
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(html.encode())
-
-    def process_request(self, params):
-        name = params.get("name", ["Guest"])[0]
-        num = int(params.get("num", [0])[0])
-
-        # Fibonacci logic
-        fib_series = []
-        a, b = 0, 1
-
-        if num <= 0:
-            fib_series = "Enter a positive number"
-        else:
-            for _ in range(num):
-                fib_series.append(a)
-                a, b = b, a + b
-
-        result = f"""
-        <html>
-        <body>
-            <h3>Hello {name}</h3>
-            <p>Number of terms: {num}</p>
-            <p>Fibonacci Series: <b>{fib_series}</b></p>
-        </body>
-        </html>
-        """
-
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(result.encode())
-
-server = HTTPServer(("0.0.0.0", 8000), CloudService)
-print("Server running on port 8000...")
-server.serve_forever()
-
-prime no python cloud
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
-
-class CloudService(BaseHTTPRequestHandler):
-
-    def do_GET(self):
-        parsed_url = urlparse(self.path)
-        params = parse_qs(parsed_url.query)
-
-        if parsed_url.path == "/":
-            self.show_form()
-
-        elif parsed_url.path == "/process":
-            self.process_request(params)
-
-    def show_form(self):
-        html = """
-        <html>
-        <body>
-            <h2>Prime Number Checker (Cloud Simulation)</h2>
-            <form action="/process" method="get">
-                Enter your name:
-                <input type="text" name="name"><br><br>
-
-                Enter a number:
-                <input type="number" name="num"><br><br>
-
-                <input type="submit" value="Check">
-            </form>
-        </body>
-        </html>
-        """
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(html.encode())
-
-    def process_request(self, params):
-        name = params.get("name", ["Guest"])[0]
-        num = int(params.get("num", [0])[0])
-
-        # Prime number logic
-        if num <= 1:
-            result_value = "Not a Prime Number"
-        else:
-            is_prime = True
-            for i in range(2, int(num**0.5) + 1):
-                if num % i == 0:
-                    is_prime = False
+def decryption(ciphertext, keyword):
+    plain = ""
+    for char in ciphertext:
+        if char.lower() in keyword.values():   # check lowercase value
+            for k, v in keyword.items():
+                if v == char.lower():   # match ignoring case
+                    dec = k
+                    plain += dec.upper() if char.isupper() else dec
                     break
+        else:
+            plain += char
+    return plain
 
-            if is_prime:
-                result_value = "Prime Number"
+encrypted = encryption(msg, key)
+print("Encrypted text:", encrypted)
+
+decrypted = decryption(encrypted, key)
+print("Decrypted text:", decrypted)
+
+
+Vernam Cipher program
+import string
+
+def vernamencrypt(msg, key):
+    ct = ""
+    pool = list(string.ascii_lowercase)
+
+    for i in range(len(msg)):
+        pt = pool.index(msg[i])
+        k = pool.index(key[i])
+        xor = pt + k
+
+        if xor >= 26:
+            xor = xor - 26
+
+        ct += pool[xor]
+
+    return ct
+
+msg = input("Enter the msg: ").lower()
+key = input("Enter the key: ").lower()
+
+if len(msg) != len(key):
+    print("can't run the program")
+else:
+    print("The cipher text for the following plain text is: ", vernamencrypt(msg, key))
+
+
+Playfair Cipher Program
+import string
+
+msg = input("Enter the msg: ").lower().replace("j", "i")
+key = input("Enter the key: ").lower().replace("j", "i")
+
+def gen_matrix(key):
+    keymat = []
+    k = []
+    pool = [char for char in list(string.ascii_lowercase) if char != 'j']
+
+    for i in key:
+        if i not in k:
+            k.append(i)
+
+    for j in pool:
+        if j not in k:
+            k.append(j)
+def getlocation(char, matrix):
+    for row in range(5):
+        for col in range(5):
+            if matrix[row][col] == char:
+                return (row, col)
+
+def playfair(pt, key):
+    ct = ""
+    pt = pt.replace(" ", "")
+    km = gen_matrix(key)
+    d = digram(pt)
+
+    for i in range(0, len(d), 2):
+        c1 = getlocation(d[i], km)
+        c2 = getlocation(d[i+1], km)
+
+        # for same row
+        if c1[0] == c2[0]:
+            c1r = c1[0]
+            c1c = (c1[1] + 1) % 5
+
+            c2r = c2[0]
+            c2c = (c2[1] + 1) % 5
+            # for same column
+        elif c1[1] == c2[1]:
+            c1r = (c1[0] + 1) % 5
+            c1c = c1[1]
+
+            c2r = (c2[0] + 1) % 5
+            c2c = c2[1]
+
+# for row and col mismatch
+        else:
+            c1r = c1[0]
+            c1c = c2[1]
+
+            c2r = c2[0]
+            c2c = c1[1]
+
+        ct += km[c1r][c1c] + km[c2r][c2c]
+
+  return ct
+
+ciphertext = playfair(msg, key)
+print("Ciphertext:", ciphertext)
+
+
+Railfence Cipher Program
+# WAP to implement 1] Railfence Cipher 2] Simple columnar Cipher
+msg=input("Enter message to encrypt here: ").replace(" ","")
+rails=int(input("Enter no of rails for encryption: "))
+def railfence_encrypt(msg,rails):
+    mat=[[' ' for i in range(len(msg))] for j in range(rails)]
+    row,check=0,0
+    for char_indx in range(len(msg)):
+        if check==0:
+            mat[row][char_indx]=msg[char_indx]
+            row += 1
+            if row == rails:
+                check=1
+                row -= 1
+
+        else:
+            row -= 1
+            mat[row][char_indx]=msg[char_indx]
+            if row == 0:
+                check=0
+                row=1
+
+    ct = ""
+    for i in range(rails):
+        for j in range(len(msg)):
+            if mat[i][j] != ' ':
+                ct += mat[i][j]
+
+    return ct
+
+cipher_text = railfence_encrypt(msg, rails)
+print("Encrypted message: ", cipher_text)
+
+
+Columnar Cipher Program
+import math
+
+msg = input("Enter the message to encrypt here: ").replace(" ", "")
+keyword = input("Enter the word to be used as key: ")
+
+def gentab(msg, col):
+    row = math.ceil(len(msg) / col)
+    cell = (row * col) - len(msg)
+    msg += 'x' * cell
+
+    tab = []
+    for i in range(0, len(msg), col):
+        tab.append(msg[i:i+col])
+    return tab
+
+def columnar(pt, key):
+    ct = ""
+    key_index = list(enumerate(key))
+    key_index.sort(key=lambda x: x[1])
+    matrix = gentab(pt, len(key))
+    for index, ch in key_index:
+        for row in matrix:
+            ct += row[index]
+
+    return ct
+
+print(columnar(msg, keyword))
+
+
+RSA Algorithm Program
+import random, math
+msg = input("Enter the message to encrypt: ").replace(" ","")
+
+def genprimes(n1,n2):
+    primes=[]
+    for i in range(n1,n2+1):
+        if i>1:
+            for j in range(2,i):
+                if i%j ==0:
+                    break
             else:
-                result_value = "Not a Prime Number"
-
-        result = f"""
-        <html>
-        <body>
-            <h3>Hello {name}</h3>
-            <p>Entered Number: {num}</p>
-            <p>Result: <b>{result_value}</b></p>
-        </body>
-        </html>
-        """
-
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(result.encode())
-
-server = HTTPServer(("0.0.0.0", 8000), CloudService)
-print("Server running on port 8000...")
-server.serve_forever()
-
-palindrome python cloud
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
-
-class CloudService(BaseHTTPRequestHandler):
-
-    def do_GET(self):
-        parsed_url = urlparse(self.path)
-        params = parse_qs(parsed_url.query)
-
-        if parsed_url.path == "/":
-            self.show_form()
-
-        elif parsed_url.path == "/process":
-            self.process_request(params)
-
-    def show_form(self):
-        html = """
-        <html>
-        <body>
-            <h2>Palindrome Checker (Cloud Simulation)</h2>
-            <form action="/process" method="get">
-                Enter your name:
-                <input type="text" name="name"><br><br>
-
-                Enter a value:
-                <input type="text" name="value"><br><br>
-
-                <input type="submit" value="Check">
-            </form>
-        </body>
-        </html>
-        """
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(html.encode())
-
-    def process_request(self, params):
-        name = params.get("name", ["Guest"])[0]
-        value = params.get("value", [""])[0]
-
-        # Palindrome logic
-        if value == value[::-1]:
-            result_value = "Palindrome"
-        else:
-            result_value = "Not a Palindrome"
-
-        result = f"""
-        <html>
-        <body>
-            <h3>Hello {name}</h3>
-            <p>Entered Value: {value}</p>
-            <p>Result: <b>{result_value}</b></p>
-        </body>
-        </html>
-        """
-
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(result.encode())
-
-server = HTTPServer(("0.0.0.0", 8000), CloudService)
-print("Server running on port 8000...")
-server.serve_forever()
-
-Celcius to farenheit python cloud
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
-
-class CloudService(BaseHTTPRequestHandler):
-
-    def do_GET(self):
-        parsed_url = urlparse(self.path)
-        params = parse_qs(parsed_url.query)
-
-        if parsed_url.path == "/":
-            self.show_form()
-
-        elif parsed_url.path == "/process":
-            self.process_request(params)
-
-    def show_form(self):
-        html = """
-        <html>
-        <body>
-            <h2>Temperature Converter (Cloud Simulation)</h2>
-            <form action="/process" method="get">
-                Enter your name:
-                <input type="text" name="name"><br><br>
-
-                Enter temperature in Celsius:
-                <input type="number" name="temp"><br><br>
-
-                <input type="submit" value="Convert">
-            </form>
-        </body>
-        </html>
-        """
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(html.encode())
-
-    def process_request(self, params):
-        name = params.get("name", ["Guest"])[0]
-        temp = float(params.get("temp", [0])[0])
-
-        # Celsius to Fahrenheit logic
-        fahrenheit = (temp * 9/5) + 32
-
-        result = f"""
-        <html>
-        <body>
-            <h3>Hello {name}</h3>
-            <p>Temperature in Celsius: {temp}°C</p>
-            <p>Temperature in Fahrenheit: <b>{fahrenheit}°F</b></p>
-        </body>
-        </html>
-        """
-
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(result.encode())
-
-server = HTTPServer(("0.0.0.0", 8000), CloudService)
-print("Server running on port 8000...")
-server.serve_forever()
-
-Farenheit to celcius python cloud
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
-
-class CloudService(BaseHTTPRequestHandler):
-
-    def do_GET(self):
-        parsed_url = urlparse(self.path)
-        params = parse_qs(parsed_url.query)
-
-        if parsed_url.path == "/":
-            self.show_form()
-
-        elif parsed_url.path == "/process":
-            self.process_request(params)
-
-    def show_form(self):
-        html = """
-        <html>
-        <body>
-            <h2>Temperature Converter (Cloud Simulation)</h2>
-            <form action="/process" method="get">
-                Enter your name:
-                <input type="text" name="name"><br><br>
-
-                Enter temperature in Fahrenheit:
-                <input type="number" name="temp"><br><br>
-
-                <input type="submit" value="Convert">
-            </form>
-        </body>
-        </html>
-        """
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(html.encode())
-
-    def process_request(self, params):
-        name = params.get("name", ["Guest"])[0]
-        temp = float(params.get("temp", [0])[0])
-
-        # Fahrenheit to Celsius logic
-        celsius = (temp - 32) * 5/9
-
-        result = f"""
-        <html>
-        <body>
-            <h3>Hello {name}</h3>
-            <p>Temperature in Fahrenheit: {temp}°F</p>
-            <p>Temperature in Celsius: <b>{celsius}°C</b></p>
-        </body>
-        </html>
-        """
-
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(result.encode())
-
-server = HTTPServer(("0.0.0.0", 8000), CloudService)
-print("Server running on port 8000...")
-server.serve_forever()
-
-Even or odd python cloud 
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
-
-class CloudService(BaseHTTPRequestHandler):
-
-    def do_GET(self):
-        parsed_url = urlparse(self.path)
-        params = parse_qs(parsed_url.query)
-
-        if parsed_url.path == "/":
-            self.show_form()
-
-        elif parsed_url.path == "/process":
-            self.process_request(params)
-
-    def show_form(self):
-        html = """
-        <html>
-        <body>
-            <h2>Even or Odd Checker (Cloud Simulation)</h2>
-            <form action="/process" method="get">
-                Enter your name:
-                <input type="text" name="name"><br><br>
-
-                Enter a number:
-                <input type="number" name="num"><br><br>
-
-                <input type="submit" value="Check">
-            </form>
-        </body>
-        </html>
-        """
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(html.encode())
-
-    def process_request(self, params):
-        name = params.get("name", ["Guest"])[0]
-        num = int(params.get("num", [0])[0])
-
-        # Even / Odd logic
-        if num % 2 == 0:
-            result_value = "Even Number"
-        else:
-            result_value = "Odd Number"
-
-        result = f"""
-        <html>
-        <body>
-            <h3>Hello {name}</h3>
-            <p>Entered Number: {num}</p>
-            <p>Result: <b>{result_value}</b></p>
-        </body>
-        </html>
-        """
-
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(result.encode())
-
-server = HTTPServer(("0.0.0.0", 8000), CloudService)
-print("Server running on port 8000...")
-server.serve_forever()
-
-Amstrong Number python cloud
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
-
-class CloudService(BaseHTTPRequestHandler):
-
-    def do_GET(self):
-        parsed_url = urlparse(self.path)
-        params = parse_qs(parsed_url.query)
-
-        if parsed_url.path == "/":
-            self.show_form()
-
-        elif parsed_url.path == "/process":
-            self.process_request(params)
-
-    def show_form(self):
-        html = """
-        <html>
-        <body>
-            <h2>Armstrong Number Checker (Cloud Simulation)</h2>
-            <form action="/process" method="get">
-                Enter your name:
-                <input type="text" name="name"><br><br>
-
-                Enter a number:
-                <input type="number" name="num"><br><br>
-
-                <input type="submit" value="Check">
-            </form>
-        </body>
-        </html>
-        """
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(html.encode())
-
-    def process_request(self, params):
-        name = params.get("name", ["Guest"])[0]
-        num = int(params.get("num", [0])[0])
-
-        # Armstrong logic
-        temp = num
-        power = len(str(num))
-        total = 0
-
-        while temp > 0:
-            digit = temp % 10
-            total += digit ** power
-            temp //= 10
-
-        if total == num:
-            result_value = "Armstrong Number"
-        else:
-            result_value = "Not an Armstrong Number"
-
-        result = f"""
-        <html>
-        <body>
-            <h3>Hello {name}</h3>
-            <p>Entered Number: {num}</p>
-            <p>Result: <b>{result_value}</b></p>
-        </body>
-        </html>
-        """
-
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(result.encode())
-
-server = HTTPServer(("0.0.0.0", 8000), CloudService)
-print("Server running on port 8000...")
-server.serve_forever()
-
-GCD python cloud
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
-
-class CloudService(BaseHTTPRequestHandler):
-
-    def do_GET(self):
-        parsed_url = urlparse(self.path)
-        params = parse_qs(parsed_url.query)
-
-        if parsed_url.path == "/":
-            self.show_form()
-
-        elif parsed_url.path == "/process":
-            self.process_request(params)
-
-    def show_form(self):
-        html = """
-        <html>
-        <body>
-            <h2>GCD Calculator (Cloud Simulation)</h2>
-            <form action="/process" method="get">
-                Enter your name:
-                <input type="text" name="name"><br><br>
-
-                Enter first number:
-                <input type="number" name="a"><br><br>
-
-                Enter second number:
-                <input type="number" name="b"><br><br>
-
-                <input type="submit" value="Calculate">
-            </form>
-        </body>
-        </html>
-        """
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(html.encode())
-
-    def process_request(self, params):
-        name = params.get("name", ["Guest"])[0]
-        a = int(params.get("a", [0])[0])
-        b = int(params.get("b", [0])[0])
-
-        # GCD logic (Euclidean Algorithm)
-        x, y = a, b
-        while y != 0:
-            x, y = y, x % y
-
-        gcd = x
-
-        result = f"""
-        <html>
-        <body>
-            <h3>Hello {name}</h3>
-            <p>First Number: {a}</p>
-            <p>Second Number: {b}</p>
-            <p>GCD: <b>{gcd}</b></p>
-        </body>
-        </html>
-        """
-
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(result.encode())
-
-server = HTTPServer(("0.0.0.0", 8000), CloudService)
-print("Server running on port 8000...")
-server.serve_forever()
-
-Krishnamurthy number python cloud
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
-
-class CloudService(BaseHTTPRequestHandler):
-
-    def do_GET(self):
-        parsed_url = urlparse(self.path)
-        params = parse_qs(parsed_url.query)
-
-        if parsed_url.path == "/":
-            self.show_form()
-
-        elif parsed_url.path == "/process":
-            self.process_request(params)
-
-    def show_form(self):
-        html = """
-        <html>
-        <body>
-            <h2>Krishnamurthy Number Checker (Cloud Simulation)</h2>
-            <form action="/process" method="get">
-                Enter your name:
-                <input type="text" name="name"><br><br>
-
-                Enter a number:
-                <input type="number" name="num"><br><br>
-
-                <input type="submit" value="Check">
-            </form>
-        </body>
-        </html>
-        """
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(html.encode())
-
-    def process_request(self, params):
-        name = params.get("name", ["Guest"])[0]
-        num = int(params.get("num", [0])[0])
-
-        # Function to calculate factorial
-        def factorial(n):
-            fact = 1
-            for i in range(1, n + 1):
-                fact *= i
-            return fact
-
-        # Krishnamurthy logic
-        temp = num
-        total = 0
-
-        while temp > 0:
-            digit = temp % 10
-            total += factorial(digit)
-            temp //= 10
-
-        if total == num:
-            result_value = "Krishnamurthy Number"
-        else:
-            result_value = "Not a Krishnamurthy Number"
-
-        result = f"""
-        <html>
-        <body>
-            <h3>Hello {name}</h3>
-            <p>Entered Number: {num}</p>
-            <p>Result: <b>{result_value}</b></p>
-        </body>
-        </html>
-        """
-
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(result.encode())
-
-server = HTTPServer(("0.0.0.0", 8000), CloudService)
-print("Server running on port 8000...")
-server.serve_forever()
-
-Reverse number python cloud
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
-
-class CloudService(BaseHTTPRequestHandler):
-
-    def do_GET(self):
-        parsed_url = urlparse(self.path)
-        params = parse_qs(parsed_url.query)
-
-        if parsed_url.path == "/":
-            self.show_form()
-
-        elif parsed_url.path == "/process":
-            self.process_request(params)
-
-    def show_form(self):
-        html = """
-        <html>
-        <body>
-            <h2>Reverse Number (Cloud Simulation)</h2>
-            <form action="/process" method="get">
-                Enter your name:
-                <input type="text" name="name"><br><br>
-
-                Enter a number:
-                <input type="number" name="num"><br><br>
-
-                <input type="submit" value="Reverse">
-            </form>
-        </body>
-        </html>
-        """
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(html.encode())
-
-    def process_request(self, params):
-        name = params.get("name", ["Guest"])[0]
-        num = int(params.get("num", [0])[0])
-
-        # Reverse number logic
-        reverse = int(str(num)[::-1])
-
-        result = f"""
-        <html>
-        <body>
-            <h3>Hello {name}</h3>
-            <p>Entered Number: {num}</p>
-            <p>Reversed Number: <b>{reverse}</b></p>
-        </body>
-        </html>
-        """
-
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write(result.encode())
-
-server = HTTPServer(("0.0.0.0", 8000), CloudService)
-print("Server running on port 8000...")
-server.serve_forever()
-
-Cloud Computing services [theory]
-1) IaaS
-
-Definition:
-IaaS provides a variety of computing infrastructure such as storage, servers, and hardware. It also maintains and supports these infrastructure.
-
-Key Features:
-(i) flexible
-(ii) resources are highly scalable
-(iii) cost depends on use
-(iv) single piece of hardware serves many users
-(v) Guest has complete control over the architecture
-
-Pros:
-(i) Most flexible & dynamic model
-(ii) cost effective pay for what you use
-(iii) easy to use since it drops hardware automatically
-(iv) Management tasks are handled, so employees have time for other tasks
-
-Cons:
-(i) Data security can be a concern due to multitenant architecture
-(ii) Team handling is required to know about the own infrastructure
-(iii) While servers controlled at user side, customers cannot access their hardware
-
-2) PaaS
-
-Definition:
-PaaS is a cloud service where the development, testing & organizing the software app takes place. Implementing PaaS simplifies the process of software development.
-
-Key Features:
-(i) Multiple users can access the same app
-(ii) Users are managing their own data
-(iii) Run services & databases are managed in same environment
-(iv) Web services & databases are hosted
-(v) Teams can collaborate easily
-
-Pros:
-(i) The development process is faster & easy
-(ii) creating, testing and deploying app is cost efficient
-(iii) less coding is required
-(iv) easy migration to hybrid cloud
-
-Cons:
-(i) Data security is an issue due to multitenant architecture
-(ii) Not every element is compatible with existing infrastructure
-
-3) SaaS
-
-Definition:
-SaaS provides software operating from hardware infrastructure using the app functionality and users are all available for working in their pocket. They only use programs to complete their tasks.
-
-Key Features:
-(i) Transmission & upgradation will be done by providers
-(ii) services are scaled based on requirements
-(iii) Apps are accessed through centralized system
-(iv) The provider is responsible for security
-
-Pros:
-(i) No hardware & setup cost, it is a pay-as-you-go model
-(ii) It is easy to use and user friendly
-(iii) Access from any location
-
-Cons:
-(i) The application has to be within control
-(ii) limited range of data controls
-(iii) The devices should be connected for efficient working
-
-Cisco cloud [theory]
-Cisco cloud (meta cloud)
-
-→ In 2016, Cisco acquired its rights to acquire privately held Metacloud. Based in Pasadena, Calif., metacloud offers a private cloud or global OpenStack platform. Using OpenStack, a open source model that delivers a variety of computing, production ready private cloud infrastructure to its users.
-
-→ Metacloud’s OpenStack based cloud platform was accessed on Cisco strongly to build a robust target global infrastructure, a network of cloud, together with ease, to deliver solutions anywhere.
-
-→ VMware based services can be easily deployed in Cisco cloud, helping technology providers, services providers, as well as large enterprises to run Cisco cloud services. Cisco cloud platform can be used by service providers to offer cloud services to their customers.
-
-→ The open cloud strategy of Cisco accelerates helping in the ability to handle on demand, private, hybrid or public cloud. Also the ability to manage open networking, reduce TCO and increase performance.
-
-→ Cisco’s cloud platform provides a wide range of services including virtualization, storage, networking and analytics, making it a complete cloud solution.
-
-Foss Cloud [theory]
-Free and open source software (FOSS) cloud computing represents the convergence of open source software with distributed networked computing. In simple terms, it is the application to cloud computing that makes use of free and open source software.
-
-History & Evolution:
-1983 – Free & open cloud computing
-1990s – Free software movement
-1998 – Linux & open source
-2000s – present: Free & open cloud
-Background & Purpose
-Philosophy: For ensuring transparency, avoiding vendor lock-in, community driven development.
-Economic Benefit: Free software licensing cost associated with proprietary enterprise software.
-Corporate Adoption: Large companies (Red Hat, IBM, Google) invest in & contribute to FOSS, making it dominant force in cloud infrastructure.
-Security: The availability of source code allows for faster, proactive vulnerability discovery & fixing.
-
-RSS Feed Prac8 [XML]
-<rss version="2.0">
-    <channel>
-        <title>RSS Practical</title>
-        <link>http://siesascs.edu.in</link>
-        <description>Cloud Computing Practical</description>
-
-        <item>
-            <title>RSS Tutorial</title>
-            <link>https://en.wikipedia.org/wiki/Cricket_World_Cup</link>
-            <description>List of Cricket World Cup Winners</description>
-        </item>
-
-        <item>
-            <title>World Cup Winners</title>
-            <link></link>
-            <description>New RSS tutorial on W3Schools</description>
-        </item>
-
-        <item>
-            <title>Facebook</title>
-            <link>https://www.facebook.com</link>
-            <description>Open Facebook Page</description>
-        </item>
-
-    </channel>
-</rss>
+                primes.append(i)
+    return primes
+
+def genPURPkeys():
+    p = random.choice(genprimes(10,20))
+    q = random.choice(genprimes(30,40))
+    n=p*q
+    phi = (p-1)*(q-1)
+
+    e=2
+    while (e<phi):
+        if math.gcd(e,phi) == 1:
+            break
+        e+=1
+
+    i=1
+    while True:
+        d=((phi*i)+1)/e
+
+        if int(d) == d:
+            break
+
+        i+=1
+
+    return [e,d,n]
+
+def rsaencrypt(e,n,msg):
+    codes = [ord(sym) for sym in msg]
+    ct = [(pt**e) % n for pt in codes]
+    return ct
+
+def rsadecrypt(d,n,cipher):
+    pt = [(ct**int(d))% n for ct in cipher]
+    msg=[chr(c) for c in pt]
+    return msg
+
+keys=genPURPkeys()
+e=keys[0]
+n=keys[2]
+ct=rsaencrypt(e,n,msg)
+print(ct)
+d=keys[1]
+print(rsadecrypt(d,n,ct))
+
+Diffie Hellmann Algorithm Program
+# WAP to implement Diffie-Hellmann key exchange
+import math
+x=10
+y=15
+def genkey(x,y):
+    p=11
+    q=8
+    r1=(q**x)%p
+    r2=(q**y)%p
+    p1=(r2**x)%p
+    p2=(r1**y)%p
+    if (p1==p2):
+        print("Shared key are success")
+    else:
+        print("Failure")
+
+genkey(x,y)
+
+Keyloggers Program
+from pynput.keyboard import Key,Listener
+def keypress(key):
+    print("Key Pressed: "key)
+def keyrelease(key):
+    if key==Key.esc:
+        return False
+with Listener(on_press=keypress,on_release=keyrelease) as lst:
+    lst.join()
