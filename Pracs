@@ -336,3 +336,46 @@ NMAP Practical Commands
 19]nmap -sF -p 22,113,139 www.siesascs.edu.in
 20]nmap -sX -p 22,113,139 www.siesascs.edu.in
 21]nmap -sN -p 22,113,139 www.siesascs.edu.in
+
+
+DORK Practical
+1]site:com inurl:http football
+2]site:com -inurl:http football
+3]site:com inurl:http location:mumbai football
+4]filetype:pdf ethical hacking
+5]filetype:xlsx site:in budget 2026
+6]artificial intelligence before:2015
+7]artificial intelligence after:2020
+8]artificial intelligence intitle:resources
+9]artificial intelligence site:facebook.com
+
+
+IDS Practical 10
+1]Change line number 45 do ipconfig than set IP address of that pc
+2]change line 48 set !$HOME_NET
+3]change line 104,comment out line 105,106 do absolute path of the files
+4]change 113 and 114 set absolute path files
+5]change 186 line do uncomment and set absolute path for log files
+6]check the blacklist file in snort rule folder and create whilelist file and copy the content same as for blacklist just change the last line as whitelist
+7]Line 511 and 512 we dont have while.list file and black.list file so create two files names as respectively write content in while list and black list file as follows
+white.list content:
+#SNORT WHITE LIST
+#LIST IP ADDRESS, ONE PER LINE
+black.list content:
+#SNORT black LIST
+#LIST IP ADDRESS, ONE PER LINE
+in rules folder do this changes or create files
+Then change in config file at line 511 and 512 remove .rules from both the lines
+
+Open the command prompt from the bin folder of snort
+Run the commands which are below
+1]snort -W
+2]snort -i 7 -c C:\Snort\etc\snort.conf -T
+3]write the extra content in local rules files which is in rules folder 
+Write :- 
+#set alert for icmp, udp and tcp
+alert icmp any any -> any any (msg : "ICMP alert test"; sid: 1000001;)
+alert udp any any -> any any (msg : "UDP alert test"; sid: 1000002;)
+alert tcp any any -> any any (msg : "TCP alert test"; sid: 1000003;)
+4]snort -i 7 -c C:\Snort\etc\snort.conf -A
+5]snort -i 7 -c C:\Snort\etc\snort.conf -A console
