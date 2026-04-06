@@ -1,381 +1,346 @@
-Ceaser Cipher Program
-Encrypt text:-
-import string 
-msg = input("Enter message to Encrypt:") 
-def encrypt(msg, key=3): 
-    pt = list(string.ascii_lowercase) + list(string.ascii_uppercase) 
-    cipher= "" 
-    for char in range(len(msg)): 
-        if msg[char] in pt: 
-            E = (pt.index(msg[char]) + key) % len(pt) 
-            cipher += pt[E] 
-        else: 
-            cipher += msg[char] 
-    return cipher print("Cipher text: ", encrypt(msg))
-
-Decrypt text:-
-import string 
-msg = input("Enter message to Decrypt:") 
-def decrypt(msg, key=3): 
-    pt = list(string.ascii_lowercase) + list(string.ascii_uppercase) 
-    plain = "" 
-    for char in range(len(msg)): 
-        if msg[char] in pt: 
-            D = (pt.index(msg[char]) - key) % len(pt) 
-            plain += pt[D] 
-        else: 
-            plain += msg[char] 
-    return plain print("Plain text: ", decrypt(msg))
-
-
-Monoalphabetic Cipher Program
-import random
-import string
-
-msg = input("Enter message to encrypt: ")
-
-def gen_key():
-    symbols = list(string.ascii_lowercase)
-    sym_shuff = list(string.ascii_lowercase)
-    random.shuffle(sym_shuff)
-    return dict(zip(symbols, sym_shuff))
-
-key = gen_key()
-print("Generated key:", key)
-
-def encryption(msg, keyword):
-    cipher = ""
-    for char in msg:
-        if char.lower() in keyword:   # check lowercase version
-            # preserve case
-            enc = keyword[char.lower()]
-            cipher += enc.upper() if char.isupper() else enc
-        else:
-            cipher += char
-    return cipher
-
-def decryption(ciphertext, keyword):
-    plain = ""
-    for char in ciphertext:
-        if char.lower() in keyword.values():   # check lowercase value
-            for k, v in keyword.items():
-                if v == char.lower():   # match ignoring case
-                    dec = k
-                    plain += dec.upper() if char.isupper() else dec
-                    break
-        else:
-            plain += char
-    return plain
-
-encrypted = encryption(msg, key)
-print("Encrypted text:", encrypted)
-
-decrypted = decryption(encrypted, key)
-print("Decrypted text:", decrypted)
+Practical 1 Basics of neural networks
+import tensorflow as tf
+from tensorflow.keras import layers, models
+import matplotlib.pyplot as plt
+(x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
+print(x_train.shape) 
+print(y_train.shape)  
+x_train = x_train / 255.0
+x_test = x_test / 255.0
+model = models.Sequential([
+    layers.Flatten(input_shape=(28, 28)),   # Convert 2D → 1D
+    layers.Dense(128, activation='relu'),   # Hidden layer
+    layers.Dense(10, activation='softmax')  # Output layer
+])
+model.summary()
+model.compile(
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+history = model.fit(
+    x_train, y_train,
+    epochs=5,
+    batch_size=32,
+    validation_split=0.1
+)
+test_loss, test_accuracy = model.evaluate(x_test, y_test)
+print("Test Accuracy:", test_accuracy)
+predictions = model.predict(x_test)
+print("Predicted digit:", predictions[0].argmax())
+print("Actual digit:", y_test[0])
+plt.imshow(x_test[0], cmap='gray')
+plt.title(f"Predicted: {predictions[0].argmax()}")
+plt.axis('off')
+plt.show()
 
 
-Vernam Cipher program
-import string
+Practical 2 Variational AutoEncoder
+import numpy as np
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+import matplotlib.pyplot as plt
+class Sampling(layers.Layer):
+    def call(self, inputs):
+        z_mean, z_log_var = inputs
+        batch = tf.shape(z_mean)[0]
+        dim = tf.shape(z_mean)[1]
+        epsilon = tf.random.normal(shape=(batch, dim))
+        return z_mean + tf.exp(0.5 * z_log_var) * epsilon
+def build_encoder(latent_dim=2):
+    encoder_inputs = keras.Input(shape=(28, 28, 1))
+    x = layers.Conv2D(32, 3, activation="relu", strides=2, padding="same")(encoder_inputs)
+    x = layers.Conv2D(64, 3, activation="relu", strides=2, padding="same")(x)
+    x = layers.Flatten()(x)
+    x = layers.Dense(16, activation="relu")(x)
+    z_mean = layers.Dense(latent_dim, name="z_mean")(x)
+    z_log_var = layers.Dense(latent_dim, name="z_log_var")(x)
+    z = Sampling()([z_mean, z_log_var])
+    encoder = keras.Model(encoder_inputs, [z_mean, z_log_var, z], name="encoder")
+    return encoder
+def build_decoder(latent_dim=2):
+    latent_inputs = keras.Input(shape=(latent_dim,))
+    x = layers.Dense(7 * 7 * 64, activation="relu")(latent_inputs)
+    x = layers.Reshape((7, 7, 64))(x)
+    x = layers.Conv2DTranspose(64, 3, activation="relu", strides=2, padding="same")(x)
+    x = layers.Conv2DTranspose(32, 3, activation="relu", strides=2, padding="same")(x)
+    decoder_outputs = layers.Conv2DTranspose(1, 3, activation="sigmoid", padding="same")(x)
+    decoder = keras.Model(latent_inputs, decoder_outputs, name="decoder")
+    return decoder
+class VAE(keras.Model):
+    def __init__(self, encoder, decoder, **kwargs):
+        super().__init__(**kwargs)
+        self.encoder = encoder
+        self.decoder = decoder
+        self.total_loss_tracker = keras.metrics.Mean(name="total_loss")
+        self.reconstruction_loss_tracker = keras.metrics.Mean(name="reconstruction_loss")
+        self.kl_loss_tracker = keras.metrics.Mean(name="kl_loss")
 
-def vernamencrypt(msg, key):
-    ct = ""
-    pool = list(string.ascii_lowercase)
+    @property
+    def metrics(self):
+        return [
+            self.total_loss_tracker,
+            self.reconstruction_loss_tracker,
+            self.kl_loss_tracker,
+        ]
 
-    for i in range(len(msg)):
-        pt = pool.index(msg[i])
-        k = pool.index(key[i])
-        xor = pt + k
+    def call(self, inputs):
+        z_mean, z_log_var, z = self.encoder(inputs)
+        reconstruction = self.decoder(z)
+        return reconstruction
 
-        if xor >= 26:
-            xor = xor - 26
+    def train_step(self, data):
+        with tf.GradientTape() as tape:
+            z_mean, z_log_var, z = self.encoder(data)
+            reconstruction = self.decoder(z)
+            reconstruction_loss = tf.reduce_mean(
+                tf.reduce_sum(
+                    keras.losses.binary_crossentropy(data, reconstruction),
+                    axis=(1, 2)
+                )
+            )
+            kl_loss = -0.5 * (1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
+            kl_loss = tf.reduce_mean(tf.reduce_sum(kl_loss, axis=1))
+            total_loss = reconstruction_loss + kl_loss
+        grads = tape.gradient(total_loss, self.trainable_weights)
+        self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
+        self.total_loss_tracker.update_state(total_loss)
+        self.reconstruction_loss_tracker.update_state(reconstruction_loss)
+        self.kl_loss_tracker.update_state(kl_loss)
+        return {
+            "loss": self.total_loss_tracker.result(),
+            "reconstruction_loss": self.reconstruction_loss_tracker.result(),
+            "kl_loss": self.kl_loss_tracker.result(),
+        }
 
-        ct += pool[xor]
+    def test_step(self, data):
+        x = data # The issue was 'data' itself, not data[0] here. The previous fix was incomplete.
+        if isinstance(x, tuple): # Add check if data is a tuple (features, labels)
+          x = x[0] # Extract input features if it's a tuple
 
-    return ct
+        z_mean, z_log_var, z = self.encoder(x)
+        reconstruction = self.decoder(z)
+        reconstruction_loss = tf.reduce_mean(
+            tf.reduce_sum(
+                keras.losses.binary_crossentropy(x, reconstruction),
+                axis=(1, 2)
+            )
+        )
+        kl_loss = -0.5 * (1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
+        kl_loss = tf.reduce_mean(tf.reduce_sum(kl_loss, axis=1))
+        total_loss = reconstruction_loss + kl_loss
 
-msg = input("Enter the msg: ").lower()
-key = input("Enter the key: ").lower()
+        self.total_loss_tracker.update_state(total_loss)
+        self.reconstruction_loss_tracker.update_state(reconstruction_loss)
+        self.kl_loss_tracker.update_state(kl_loss)
+        return {
+            "loss": self.total_loss_tracker.result(),
+            "reconstruction_loss": self.reconstruction_loss_tracker.result(),
+            "kl_loss": self.kl_loss_tracker.result(),
+        }
+(x_train, _), (x_test, _) = keras.datasets.mnist.load_data()
+x_train = np.expand_dims(x_train, -1).astype("float32") / 255
+x_test = np.expand_dims(x_test, -1).astype("float32") / 255
+latent_dim = 2
+encoder = build_encoder(latent_dim)
+decoder = build_decoder(latent_dim)
+vae = VAE(encoder, decoder)
+vae.compile(optimizer=keras.optimizers.Adam(), loss='mse')
+print("Training VAE...")
+vae.fit(x_train, epochs=10, batch_size=128, validation_data=(x_test, x_test))
+def plot_latent_space(vae, n=20, figsize=15):
+    digit_size = 28
+    scale = 1.0
+    figure = np.zeros((digit_size * n, digit_size * n))
+    grid_x = np.linspace(-scale, scale, n)
+    grid_y = np.linspace(-scale, scale, n)[::-1]
 
-if len(msg) != len(key):
-    print("can't run the program")
-else:
-    print("The cipher text for the following plain text is: ", vernamencrypt(msg, key))
+    for i, yi in enumerate(grid_y):
+        for j, xi in enumerate(grid_x):
+            z_sample = np.array([[xi, yi]])
+            x_decoded = vae.decoder.predict(z_sample, verbose=0)
+            digit = x_decoded[0].reshape(digit_size, digit_size)
+            figure[
+                i * digit_size : (i + 1) * digit_size,
+                j * digit_size : (j + 1) * digit_size,
+            ] = digit
 
+    plt.figure(figsize=(figsize, figsize))
+    plt.imshow(figure, cmap="Greys_r")
+    plt.title("VAE Latent Space Visualization")
+    plt.axis("off")
+    plt.show()
+plot_latent_space(vae)
+def generate_samples(decoder, n_samples=10):
+    z_sample = np.random.normal(size=(n_samples, latent_dim))
+    generated = decoder.predict(z_sample, verbose=0)
 
-Playfair Cipher Program
-import string
-
-msg = input("Enter the msg: ").lower().replace("j", "i")
-key = input("Enter the key: ").lower().replace("j", "i")
-
-def gen_matrix(key):
-    keymat = []
-    k = []
-    pool = [char for char in list(string.ascii_lowercase) if char != 'j']
-
-    for i in key:
-        if i not in k:
-            k.append(i)
-
-    for j in pool:
-        if j not in k:
-            k.append(j)
-def getlocation(char, matrix):
-    for row in range(5):
-        for col in range(5):
-            if matrix[row][col] == char:
-                return (row, col)
-
-def playfair(pt, key):
-    ct = ""
-    pt = pt.replace(" ", "")
-    km = gen_matrix(key)
-    d = digram(pt)
-
-    for i in range(0, len(d), 2):
-        c1 = getlocation(d[i], km)
-        c2 = getlocation(d[i+1], km)
-
-        # for same row
-        if c1[0] == c2[0]:
-            c1r = c1[0]
-            c1c = (c1[1] + 1) % 5
-
-            c2r = c2[0]
-            c2c = (c2[1] + 1) % 5
-            # for same column
-        elif c1[1] == c2[1]:
-            c1r = (c1[0] + 1) % 5
-            c1c = c1[1]
-
-            c2r = (c2[0] + 1) % 5
-            c2c = c2[1]
-
-# for row and col mismatch
-        else:
-            c1r = c1[0]
-            c1c = c2[1]
-
-            c2r = c2[0]
-            c2c = c1[1]
-
-        ct += km[c1r][c1c] + km[c2r][c2c]
-
-  return ct
-
-ciphertext = playfair(msg, key)
-print("Ciphertext:", ciphertext)
-
-
-Railfence Cipher Program
-# WAP to implement 1] Railfence Cipher 2] Simple columnar Cipher
-msg=input("Enter message to encrypt here: ").replace(" ","")
-rails=int(input("Enter no of rails for encryption: "))
-def railfence_encrypt(msg,rails):
-    mat=[[' ' for i in range(len(msg))] for j in range(rails)]
-    row,check=0,0
-    for char_indx in range(len(msg)):
-        if check==0:
-            mat[row][char_indx]=msg[char_indx]
-            row += 1
-            if row == rails:
-                check=1
-                row -= 1
-
-        else:
-            row -= 1
-            mat[row][char_indx]=msg[char_indx]
-            if row == 0:
-                check=0
-                row=1
-
-    ct = ""
-    for i in range(rails):
-        for j in range(len(msg)):
-            if mat[i][j] != ' ':
-                ct += mat[i][j]
-
-    return ct
-
-cipher_text = railfence_encrypt(msg, rails)
-print("Encrypted message: ", cipher_text)
-
-
-Columnar Cipher Program
-import math
-msg = input("Enter the message to encrypt here: ").replace(" ", "")
-keyword = input("Enter the word to be used as key: ")
-
-def gentab(msg, col):
-    row = math.ceil(len(msg) / col)
-    cell = (row * col) - len(msg)
-    msg += 'x' * cell
-
-    tab = []
-    for i in range(0, len(msg), col):
-        tab.append(msg[i:i+col])
-    return tab
-
-def columnar(pt, key):
-    ct = ""
-    key_index = list(enumerate(key))
-    key_index.sort(key=lambda x: x[1])
-    matrix = gentab(pt, len(key))
-    for index, ch in key_index:
-        for row in matrix:
-            ct += row[index]
-    return ct
-print(columnar(msg, keyword))
+    fig, axes = plt.subplots(2, 5, figsize=(12, 5))
+    for i, ax in enumerate(axes.flat):
+        ax.imshow(generated[i].reshape(28, 28), cmap="gray")
+        ax.axis("off")
+    plt.suptitle("Randomly Generated Images")
+    plt.tight_layout()
+    plt.show()
+generate_samples(decoder)
 
 
-RSA Algorithm Program
-import random, math
-msg = input("Enter the message to encrypt: ").replace(" ","")
+Practical 3 Simple GAN
+import numpy as np
+import matplotlib.pyplot as plt
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, LeakyReLU
+from tensorflow.keras.optimizers import Adam
+(X_train, _), (_, _) = mnist.load_data()
+X_train = (X_train - 127.5) / 127.5  
+X_train = X_train.reshape(-1, 28*28)
+def build_generator():
+    model = Sequential([
+        Dense(256, input_dim=100),
+        LeakyReLU(0.2),
+        Dense(512),
+        LeakyReLU(0.2),
+        Dense(28*28, activation='tanh')
+    ])
+    return model
 
-def genprimes(n1,n2):
-    primes=[]
-    for i in range(n1,n2+1):
-        if i>1:
-            for j in range(2,i):
-                if i%j ==0:
-                    break
-            else:
-                primes.append(i)
-    return primes
+generator = build_generator()
+def build_discriminator():
+    model = Sequential([
+        Dense(512, input_dim=28*28),
+        LeakyReLU(0.2),
+        Dense(256),
+        LeakyReLU(0.2),
+        Dense(1, activation='sigmoid')
+    ])
 
-def genPURPkeys():
-    p = random.choice(genprimes(10,20))
-    q = random.choice(genprimes(30,40))
-    n=p*q
-    phi = (p-1)*(q-1)
+    model.compile(
+        loss='binary_crossentropy',
+        optimizer=Adam(0.0002, 0.5),
+        metrics=['accuracy']
+    )
+    return model
 
-    e=2
-    while (e<phi):
-        if math.gcd(e,phi) == 1:
-            break
-        e+=1
+discriminator = build_discriminator()
+     
 
-    i=1
-    while True:
-        d=((phi*i)+1)/e
+discriminator.trainable = False
 
-        if int(d) == d:
-            break
+gan = Sequential([generator, discriminator])
+gan.compile(
+    loss='binary_crossentropy',
+    optimizer=Adam(0.0002, 0.5)
+)
+     
 
-        i+=1
+def train_gan(epochs=2000, batch_size=64):
+    for epoch in range(epochs):
+        # Train Discriminator
+        real_imgs = X_train[np.random.randint(0, X_train.shape[0], batch_size)]
+        noise = np.random.normal(0, 1, (batch_size, 100))
+        fake_imgs = generator.predict(noise, verbose=0)
 
-    return [e,d,n]
+        d_loss_real = discriminator.train_on_batch(real_imgs, np.ones((batch_size, 1)))
+        d_loss_fake = discriminator.train_on_batch(fake_imgs, np.zeros((batch_size, 1)))
 
-def rsaencrypt(e,n,msg):
-    codes = [ord(sym) for sym in msg]
-    ct = [(pt**e) % n for pt in codes]
-    return ct
+        # Train Generator
+        noise = np.random.normal(0, 1, (batch_size, 100))
+        g_loss = gan.train_on_batch(noise, np.ones((batch_size, 1)))
 
-def rsadecrypt(d,n,cipher):
-    pt = [(ct**int(d))% n for ct in cipher]
-    msg=[chr(c) for c in pt]
-    return msg
+        if epoch % 500 == 0:
+            print(f"Epoch {epoch} | D Loss: {d_loss_real[0]:.4f} | G Loss: {g_loss:.4f}")
+def generate_images():
+    noise = np.random.normal(0, 1, (10, 100))
+    images = generator.predict(noise, verbose=0)
+    images = images.reshape(10, 28, 28)
 
-keys=genPURPkeys()
-e=keys[0]
-n=keys[2]
-ct=rsaencrypt(e,n,msg)
-print(ct)
-d=keys[1]
-print(rsadecrypt(d,n,ct))
+    plt.figure(figsize=(8,4))
+    for i in range(10):
+        plt.subplot(2,5,i+1)
+        plt.imshow(images[i], cmap='gray')
+        plt.axis('off')
+    plt.show()
+train_gan()
+generate_images()
 
-Diffie Hellmann Algorithm Program
-# WAP to implement Diffie-Hellmann key exchange
-import math
-x=10
-y=15
-def genkey(x,y):
-    p=11
-    q=8
-    r1=(q**x)%p
-    r2=(q**y)%p
-    p1=(r2**x)%p
-    p2=(r1**y)%p
-    if (p1==p2):
-        print("Shared key are success")
+
+Practical 4 Solving XOR Problem
+import numpy as np
+def unitStep(v):
+    if v >= 0:
+        return 1
     else:
-        print("Failure")
-
-genkey(x,y)
-
-Keyloggers Program
-from pynput.keyboard import Key,Listener
-def keypress(key):
-    print("Key Pressed: "key)
-def keyrelease(key):
-    if key==Key.esc:
-        return False
-with Listener(on_press=keypress,on_release=keyrelease) as lst:
-    lst.join()
-
-nmap -p 1-65535 www.siesascs.edu.in
-NMAP Practical Commands
-1]nmap
-2]ipconfig
-3]nmap –sL siesascs.edu.in
-4]nmap –sP siesascs.edu.in
-5]nmap siesascs.edu.in
-6]nmap -sL 192.168.0.2
-7]nmap -sV 192.168.20.244
-8]nmap -p 88,442 www.siesascs.edu.in
-9]nmap -O 192.168.20.244
-10]nmap -A www.siesascs.edu.in
-11]nmap --top-ports 10 www.siesascs.edu.in
-12]nmap -p 1-65535 www.siesascs.edu.in
-13]nmap --script ftp-vuln-cve2010-4221 -sV www.siesascs.edu.in
-14]nmap --traceroute www.siesascs.edu.in
-15]nmap –sA www.siesascs.edu.in
-16]nmap –sA -v www.siesascs.edu.in
-17]nmap -sS www.siesascs.edu.in
-18]nmap -sS -p 22,113,139 www.siesascs.edu.in
-19]nmap -sF -p 22,113,139 www.siesascs.edu.in
-20]nmap -sX -p 22,113,139 www.siesascs.edu.in
-21]nmap -sN -p 22,113,139 www.siesascs.edu.in
+        return 0
+def perceptronModel(x, w, b):
+    v = np.dot(w, x) + b
+    y = unitStep(v)
+    return y
+def NOT_logicFunction(x):
+    wNOT = -1
+    bNOT = 0.5
+    return perceptronModel(x, wNOT, bNOT)
+def AND_logicFunction(x):
+    w = np.array([1, 1])
+    bAND = -1.5
+    return perceptronModel(x, w, bAND)
+def OR_logicFunction(x):
+    w = np.array([1, 1])
+    bOR = -0.5
+    return perceptronModel(x, w, bOR)
+def XOR_logicFunction(x):
+  y1 = AND_logicFunction(x)
+  y2 = OR_logicFunction(x)
+  y3 = NOT_logicFunction(y1)
+  final_x = np.array([y2, y3])
+  finalOutput = AND_logicFunction(final_x)
+  return finalOutput
+test1 = np.array([0, 1])
+test2 = np.array([1, 1])
+test3 = np.array([0, 0])
+test4 = np.array([1, 0])
+print("XOR({}, {}) = {}".format(0, 1, XOR_logicFunction(test1)))
+print("XOR({}, {}) = {}".format(1, 1, XOR_logicFunction(test2)))
+print("XOR({}, {}) = {}".format(0, 0, XOR_logicFunction(test3)))
+print("XOR({}, {}) = {}".format(1, 0, XOR_logicFunction(test4)))
 
 
-DORK Practical
-1]site:com inurl:http football
-2]site:com -inurl:http football
-3]site:com inurl:http location:mumbai football
-4]filetype:pdf ethical hacking
-5]filetype:xlsx site:in budget 2026
-6]artificial intelligence before:2015
-7]artificial intelligence after:2020
-8]artificial intelligence intitle:resources
-9]artificial intelligence site:facebook.com
+Practical 5 Eigen Values Vector
+import numpy as np
+m = np.array([[1, 2],
+			[2, 3]])
+print("Printing the Original square array:\n",m)
+print()
+print('***************************************')
+print()
+w, v = np.linalg.eig(m)
+print("Printing the Eigen values of the given square array:\n",w)
+print()
+print("Printing Right Eigen Vectors of the given square array:\n",v)
 
+import numpy as np
+m = np.array([[1, 2, 3],
+			[2, 3, 4],
+			[4, 5, 6]])
+print("Printing the Original square array:\n",m)
+print()
+print('***************************************')
+print()
+w, v = np.linalg.eig(m)
+print("Printing the Eigen values of the given square array:\n",w)
+print()
+print("Printing Right eigenvectors of the given square array:\n",v)
 
-IDS Practical 10
-1]Change line number 45 do ipconfig than set IP address of that pc
-2]change line 48 set !$HOME_NET
-3]change line 104,comment out line 105,106 do absolute path of the files
-4]change 113 and 114 set absolute path files
-5]change 186 line do uncomment and set absolute path for log files
-6]check the blacklist file in snort rule folder and create whilelist file and copy the content same as for blacklist just change the last line as whitelist
-7]Line 511 and 512 we dont have while.list file and black.list file so create two files names as respectively write content in while list and black list file as follows
-white.list content:
-#SNORT WHITE LIST
-#LIST IP ADDRESS, ONE PER LINE
-black.list content:
-#SNORT black LIST
-#LIST IP ADDRESS, ONE PER LINE
-in rules folder do this changes or create files
-Then change in config file at line 511 and 512 remove .rules from both the lines
+import tensorflow as tf
+e_matrix_A = tf.random.uniform([2, 2], minval=3, maxval=10, dtype=tf.float32, name="matrixA")
+print("Matrix A: \n{}\n\n".format(e_matrix_A))
 
-Open the command prompt from the bin folder of snort
-Run the commands which are below
-1]snort -W
-2]snort -i 7 -c C:\Snort\etc\snort.conf -T
-3]write the extra content in local rules files which is in rules folder 
-Write :- 
-#set alert for icmp, udp and tcp
-alert icmp any any -> any any (msg : "ICMP alert test"; sid: 1000001;)
-alert udp any any -> any any (msg : "UDP alert test"; sid: 1000002;)
-alert tcp any any -> any any (msg : "TCP alert test"; sid: 1000003;)
-4]snort -i 7 -c C:\Snort\etc\snort.conf -A
-5]snort -i 7 -c C:\Snort\etc\snort.conf -A console
+eigen_values_A, eigen_vectors_A = tf.linalg.eigh(e_matrix_A)
+print("Eigen Vectors: \n{} \n\nEigen Values: \n{}\n".format(eigen_vectors_A, eigen_values_A))
+
+e_matrix_A = tf.random.uniform([3, 3], minval=3, maxval=10, dtype=tf.float32, name="matrixA")
+print("Matrix A: \n{}\n\n".format(e_matrix_A))
+
+eigen_values_A, eigen_vectors_A = tf.linalg.eigh(e_matrix_A)
+print("Eigen Vectors: \n{} \n\nEigen Values: \n{}\n".format(eigen_vectors_A, eigen_values_A))
